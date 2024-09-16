@@ -13,7 +13,6 @@ import {
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import { getDatabase, onChildAdded, push, ref } from '@firebase/database'
 import { FirebaseError } from '@firebase/util'
-import { useRouter } from '@src/hooks/useRouter/useRouter'
 import { AuthGuard } from '@src/feature/auth/component/AuthGuard/AuthGuard'
 
 type MessageProps = {
