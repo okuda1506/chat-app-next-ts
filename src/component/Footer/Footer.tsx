@@ -3,7 +3,7 @@ import { Navigate } from '../Navigate/Navigate'
 
 export const Footer = () => {
     return (
-        <chakra.footer py={4} bgColor={'blue.600'} color={'white'}>
+        <chakra.footer py={4} bgColor={'gray.700'} color={'white'}>
             <Container maxW={'container.lg'}>
                 <Flex flexDirection={'column'} gap={2} alignItems={'start'}>
                     <Navigate href={(path) => path.$url()}>

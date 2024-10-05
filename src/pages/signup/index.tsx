@@ -9,6 +9,7 @@ import {
     Grid,
     Heading,
     Input,
+    Img,
     Spacer,
     useToast,
 } from '@chakra-ui/react'
@@ -20,13 +21,29 @@ import {
 } from 'firebase/auth'
 import { FirebaseError } from '@firebase/util'
 import { useRouter } from '@src/hooks/useRouter/useRouter'
+import { storage } from "@src/lib/firebase/firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 export const Page = () => {
     const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState<string>('')
+    const [profileImage, setProfileImage] = useState<File | undefined | null>(null)
+    // プロフィール画像のプレビュー用
+    const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const toast = useToast()
     const { push } = useRouter()
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files ? e.target.files[0] : undefined
+
+            if (file) {
+                setProfileImage(file)
+                setPreviewImageUrl(URL.createObjectURL(file))
+            }
+        }
+    }
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         setIsLoading(true)
@@ -39,6 +56,14 @@ export const Page = () => {
                 password
             )
             await sendEmailVerification(userCredential.user)
+
+            // プロフィール画像を　Firebase Storage　にアップロード
+            if (profileImage) {
+                const imageRef = ref(storage, `images/${userCredential.user.uid}`)
+                await uploadBytes(imageRef, profileImage)
+                const profileImageUrl = await getDownloadURL(imageRef)
+                console.log("プロフィール画像URL: ", profileImageUrl)
+            }
             setEmail('')
             setPassword('')
             toast({
@@ -89,6 +114,20 @@ export const Page = () => {
                                     setPassword(e.target.value)
                                 }}
                             />
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel>プロフィール画像</FormLabel>
+                            <Input
+                                type={'file'}
+                                name={'user_image'}
+                                accept=".png,.jpeg,.jpg"
+                                onChange={handleFileChange}
+                            />
+                            {previewImageUrl && (
+                                <Box mt={4}>
+                                    <Img src={previewImageUrl} alt="プロフィール画像のプレビュー" width="50px" height="50px" objectFit="cover" />
+                                </Box>
+                            )}
                         </FormControl>
                     </Box>
                 </Grid>
