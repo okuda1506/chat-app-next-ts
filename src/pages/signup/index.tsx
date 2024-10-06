@@ -125,7 +125,7 @@ export const Page = () => {
                             />
                             {previewImageUrl && (
                                 <Box mt={4}>
-                                    <Img src={previewImageUrl} alt="プロフィール画像のプレビュー" width="50px" height="50px" objectFit="cover" />
+                                    <Img src={previewImageUrl} alt="プロフィール画像のプレビュー" width="56px" height="56px" objectFit="cover" borderRadius="28px" />
                                 </Box>
                             )}
                         </FormControl>
