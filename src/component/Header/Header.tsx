@@ -19,7 +19,7 @@ import { Navigate } from '@src/component/Navigate/Navigate'
 import { useRouter } from '@src/hooks/useRouter/useRouter'
 
 export const Header = () => {
-	const { user } = useAuthContext()
+	const { user, profileImageUrl } = useAuthContext()
 	const toast = useToast()
 	const { push } = useRouter()
 
@@ -56,8 +56,13 @@ export const Header = () => {
 					<Spacer aria-hidden />
 					{user ? (
 						<Menu>
-						<MenuButton>
-							<Avatar flexShrink={0} width={10} height={10} />
+							<MenuButton>
+								<Avatar 
+									flexShrink={0} 
+									width={10} 
+									height={10} 
+									src={profileImageUrl || ''}
+								/>
 						</MenuButton>
 						<MenuList py={0}>
 							<MenuItem onClick={handleSignOut}>サインアウト</MenuItem>
