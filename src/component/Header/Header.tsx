@@ -25,18 +25,18 @@ export const Header = () => {
 
 	const handleSignOut = async () => {
 		try {
-		const auth = getAuth()
-		await signOut(auth)
-		toast({
-			title: 'ログアウトしました。',
-			status: 'success',
-			position: 'top',
-		})
-		push((path) => path.signin.$url())
-		} catch (e) {
-		if (e instanceof FirebaseError) {
-			console.log(e)
-		}
+			const auth = getAuth()
+			await signOut(auth)
+			toast({
+				title: 'ログアウトしました。',
+				status: 'success',
+				position: 'top',
+			})
+			push((path) => path.signin.$url())
+			} catch (e) {
+			if (e instanceof FirebaseError) {
+				console.log(e)
+			}
 		}
 	}
 

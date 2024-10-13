@@ -12,7 +12,7 @@ import { getDownloadURL, ref} from "firebase/storage"
 
 export type GlobalAuthState = {
     user: User | null | undefined
-    profileImageUrl: string | null
+    profileImageUrl: string | null | undefined
 }
 const initialState: GlobalAuthState = {
     user: undefined,
@@ -31,13 +31,21 @@ useEffect(() => {
         const auth = getAuth()
         return onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const imageRef = ref(storage, `images/${user.uid}`)
-                const profileImageUrl = await getDownloadURL(imageRef)
-
-                setAuthState({
-                    user, 
-                    profileImageUrl,
-                })
+                try {
+                    const imageRef = ref(storage, `images/${user.uid}`)
+                    const profileImageUrl = await getDownloadURL(imageRef)
+                    setAuthState({
+                        user, 
+                        profileImageUrl,
+                    })
+                } catch (error) {
+                    const defaultRef = ref(storage, 'images/default.png') // todo: 仮で設定
+                    const defaultImageUrl = await getDownloadURL(defaultRef)
+                    setAuthState({
+                        user, 
+                        profileImageUrl: defaultImageUrl,
+                    })
+                }
             } else {
                 setAuthState(initialState)
             }
