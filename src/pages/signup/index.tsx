@@ -58,12 +58,21 @@ export const Page = () => {
             await sendEmailVerification(userCredential.user)
 
             // プロフィール画像を　Firebase Storage　にアップロード
+            const imageRef = ref(storage, `images/${userCredential.user.uid}`)
             if (profileImage) {
-                const imageRef = ref(storage, `images/${userCredential.user.uid}`)
                 await uploadBytes(imageRef, profileImage)
                 const profileImageUrl = await getDownloadURL(imageRef)
                 console.log("プロフィール画像URL: ", profileImageUrl)
+            } else {
+                // プロフィール画像未登録の場合はdefaultの画像を設定
+                const defaultProfileImageUrl = '/img/default.png' 
+                const response = await fetch(defaultProfileImageUrl)
+                const blob = await response.blob()
+                await uploadBytes(imageRef, blob)
+                const profileImageUrl = await getDownloadURL(imageRef)
+                console.log("デフォルトのプロフィール画像URL: ", profileImageUrl)
             }
+
             setEmail('')
             setPassword('')
             toast({
