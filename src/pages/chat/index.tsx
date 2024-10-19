@@ -10,19 +10,29 @@ import {
     Spacer,
     Text,
 } from '@chakra-ui/react'
+import { useAuthContext } from '@src/feature/auth/provider/AuthProvider'
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import { getDatabase, onChildAdded, push, ref } from '@firebase/database'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/feature/auth/component/AuthGuard/AuthGuard'
 
+
 type MessageProps = {
     message: string
+    imageUrl: string
+    uid: string
 }
 
-const Message = ({ message }: MessageProps) => {
+type Chat = {
+    message: string
+    uid: string
+    profileImageUrl: string
+}
+
+const Message = ({ message, imageUrl }: MessageProps) => {
     return (
         <Flex alignItems={'start'}>
-            <Avatar />
+            <Avatar src={ imageUrl } />
             <Box ml={2}>
             <Text bgColor={'gray.200'} rounded={'md'} px={2} py={1}>
                 {message}
@@ -33,16 +43,21 @@ const Message = ({ message }: MessageProps) => {
 }
 
 export const Page = () => {
+    const { user, myProfileImageUrl } = useAuthContext()
     const messagesElementRef = useRef<HTMLDivElement | null>(null)
     const [message, setMessage] = useState<string>('')
+    const [chats, setChats] = useState<Chat[]>([])
 
     const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         try {
+            if (!user) return
             const db = getDatabase()
             const dbRef = ref(db, 'chat')
             await push(dbRef, {
-            message,
+                message,
+                uid: user.uid,
+                profileImageUrl: myProfileImageUrl
             })
             setMessage('')
         } catch (e) {
@@ -52,15 +67,17 @@ export const Page = () => {
         }
     }
 
-    const [chats, setChats] = useState<{ message: string }[]>([])
-    
     useEffect(() => {
         try {
             const db = getDatabase()
             const dbRef = ref(db, 'chat')
-            return onChildAdded(dbRef, (snapshot) => {
-                const message = String(snapshot.val()['message'] ?? '')
-                setChats((prev) => [...prev, { message }])
+            return onChildAdded(dbRef, async (snapshot) => {
+                const chatData: Chat = snapshot.val()
+                const message = String(chatData['message'] ?? '')
+                const uid = String(chatData['uid'] ?? '')
+                const profileImageUrl = String((chatData['profileImageUrl'] ?? ''))
+
+                setChats((prev) => [...prev, { message, uid, profileImageUrl: profileImageUrl }])
             })
         } catch (e) {
             if (e instanceof FirebaseError) {
@@ -95,7 +112,12 @@ export const Page = () => {
                     ref={messagesElementRef}
                 >
                     {chats.map((chat, index) => (
-                        <Message message={chat.message} key={`ChatMessage_${index}`} />
+                        <Message
+                            message={chat.message}
+                            key={`ChatMessage_${index}`}
+                            uid={chat.uid}
+                            imageUrl={chat.profileImageUrl}
+                        />
                     ))}
                 </Flex>
                 <Spacer aria-hidden />
