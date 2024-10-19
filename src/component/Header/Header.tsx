@@ -19,7 +19,7 @@ import { Navigate } from '@src/component/Navigate/Navigate'
 import { useRouter } from '@src/hooks/useRouter/useRouter'
 
 export const Header = () => {
-	const { user, profileImageUrl } = useAuthContext()
+	const { user, myProfileImageUrl } = useAuthContext()
 	const toast = useToast()
 	const { push } = useRouter()
 
@@ -61,7 +61,7 @@ export const Header = () => {
 									flexShrink={0} 
 									width={10} 
 									height={10} 
-									src={profileImageUrl || ''}
+									src={myProfileImageUrl || ''}
 								/>
 						</MenuButton>
 						<MenuList py={0}>
