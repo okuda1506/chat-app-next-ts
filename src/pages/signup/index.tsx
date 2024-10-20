@@ -57,30 +57,34 @@ export const Page = () => {
             )
             await sendEmailVerification(userCredential.user)
 
-            // プロフィール画像を　Firebase Storage　にアップロード
+            // プロフィール画像を Firebase Storage にアップロード
             const imageRef = ref(storage, `images/${userCredential.user.uid}`)
+            let profileImageUrl
             if (profileImage) {
                 await uploadBytes(imageRef, profileImage)
-                const profileImageUrl = await getDownloadURL(imageRef)
-                console.log("プロフィール画像URL: ", profileImageUrl)
+                profileImageUrl = await getDownloadURL(imageRef)
             } else {
                 // プロフィール画像未登録の場合はdefaultの画像を設定
                 const defaultProfileImageUrl = '/img/default.png' 
                 const response = await fetch(defaultProfileImageUrl)
                 const blob = await response.blob()
                 await uploadBytes(imageRef, blob)
-                const profileImageUrl = await getDownloadURL(imageRef)
-                console.log("デフォルトのプロフィール画像URL: ", profileImageUrl)
+                profileImageUrl = await getDownloadURL(imageRef)
             }
+
+            console.log("プロフィール画像URL: ", profileImageUrl)
 
             setEmail('')
             setPassword('')
+
             toast({
                 title: '確認メールを送信しました。',
                 status: 'success',
                 position: 'top',
             })
+
             push((path) => path.chat.$url())
+
         } catch (e) {
             toast({
                 title: 'エラーが発生しました。',
