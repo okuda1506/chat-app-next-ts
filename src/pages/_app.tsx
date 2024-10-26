@@ -6,10 +6,14 @@ import { AuthProvider } from '@src/feature/auth/provider/AuthProvider'
 import { Header } from '@src/component/Header/Header'
 import { Footer } from '@src/component/Footer/Footer'
 import { theme } from '@src/lib/chakra/theme'
+import { useRouter } from 'next/router'
 
 initializeFirebaseApp()
+
 export default function App({ Component, pageProps }: AppProps) {
     console.log(getApp())
+    const router = useRouter()
+    
     return (
         <ChakraProvider theme={theme}>
             <AuthProvider>
@@ -22,7 +26,7 @@ export default function App({ Component, pageProps }: AppProps) {
                 >
                     <Component {...pageProps} />
                 </chakra.main>
-                <Footer />
+                {(router.pathname === '/' || router.pathname === '/signin') && <Footer />}
             </AuthProvider>
         </ChakraProvider>
     )
