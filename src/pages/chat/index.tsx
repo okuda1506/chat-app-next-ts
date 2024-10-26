@@ -29,10 +29,15 @@ type Chat = {
     profileImageUrl: string
 }
 
-const Message = ({ message, imageUrl }: MessageProps) => {
+const Message = ({ message, uid, imageUrl }: MessageProps) => {
+    const { user } = useAuthContext()
+    const isCurrentUser = user.uid === uid
     return (
-        <Flex alignItems={'start'}>
-            <Avatar src={ imageUrl } />
+        <Flex
+            alignItems={'center'}
+            justifyContent={isCurrentUser ? 'flex-end' : 'flex-start'}
+        >
+            {!isCurrentUser ? (<Avatar src={ imageUrl } />) : null}
             <Box ml={2}>
             <Text bgColor={'gray.200'} rounded={'md'} px={2} py={1}>
                 {message}
@@ -97,7 +102,7 @@ export const Page = () => {
     return (
         <AuthGuard>
             <Container
-                py={14}
+                py={2}
                 flex={1}
                 display={'flex'}
                 flexDirection={'column'}
@@ -123,8 +128,8 @@ export const Page = () => {
                 <Spacer aria-hidden />
                 <Spacer height={2} aria-hidden flex={'none'} />
                 <chakra.form display={'flex'} gap={2} onSubmit={handleSendMessage}>
-                <Input value={message} onChange={(e) => setMessage(e.target.value)} />
-                <Button type={'submit'}>送信</Button>
+                    <Input value={message} onChange={(e) => setMessage(e.target.value)} />
+                    <Button type={'submit'}>送信</Button>
                 </chakra.form>
             </Container>
         </AuthGuard>
