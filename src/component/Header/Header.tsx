@@ -65,6 +65,12 @@ export const Header = () => {
 								/>
 						</MenuButton>
 						<MenuList py={0}>
+							<Navigate href={(path) => path.$url()}>
+								<MenuItem>TOP</MenuItem>
+							</Navigate>
+							<Navigate href={(path) => path.chat.$url()}>
+								<MenuItem>チャット</MenuItem>
+							</Navigate>
 							<MenuItem onClick={handleSignOut}>サインアウト</MenuItem>
 						</MenuList>
 						</Menu>
