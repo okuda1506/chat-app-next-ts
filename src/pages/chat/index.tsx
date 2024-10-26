@@ -31,7 +31,7 @@ type Chat = {
 
 const Message = ({ message, uid, imageUrl }: MessageProps) => {
     const { user } = useAuthContext()
-    const isCurrentUser = user.uid === uid
+    const isCurrentUser = user?.uid === uid
     return (
         <Flex
             alignItems={'center'}
