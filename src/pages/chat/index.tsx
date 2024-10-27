@@ -15,34 +15,48 @@ import { FormEvent, useEffect, useRef, useState } from 'react'
 import { getDatabase, onChildAdded, push, ref } from '@firebase/database'
 import { FirebaseError } from '@firebase/util'
 import { AuthGuard } from '@src/feature/auth/component/AuthGuard/AuthGuard'
-
+import { serverTimestamp } from '@firebase/database'
 
 type MessageProps = {
     message: string
-    imageUrl: string
     uid: string
+    imageUrl: string
+    timestamp: Date | null
 }
 
 type Chat = {
     message: string
     uid: string
     profileImageUrl: string
+    timestamp: Date | null
 }
 
-const Message = ({ message, uid, imageUrl }: MessageProps) => {
+const Message = ({ message, uid, imageUrl, timestamp }: MessageProps) => {
     const { user } = useAuthContext()
     const isCurrentUser = user?.uid === uid
+    const formattedDate = timestamp ? timestamp.toLocaleTimeString().slice(0, 5) : null
     return (
         <Flex
             alignItems={'center'}
             justifyContent={isCurrentUser ? 'flex-end' : 'flex-start'}
+            mt={isCurrentUser ? 2 : 0}
         >
+            {isCurrentUser && (
+                <Text fontSize="xs" mt={1}>
+                    {formattedDate}
+                </Text>
+            )}
             {!isCurrentUser ? (<Avatar src={ imageUrl } />) : null}
             <Box ml={2}>
-            <Text bgColor={'gray.200'} rounded={'md'} px={2} py={1}>
-                {message}
-            </Text>
+                <Text bgColor={'gray.200'} rounded={'md'} px={2} py={1}>
+                    {message}
+                </Text>
             </Box>
+            {!isCurrentUser && (
+                <Text fontSize="xs" mt={1} ml={2}>
+                    {formattedDate}
+                </Text>
+            )}
         </Flex>
     )
 }
@@ -62,7 +76,8 @@ export const Page = () => {
             await push(dbRef, {
                 message,
                 uid: user.uid,
-                profileImageUrl: myProfileImageUrl
+                profileImageUrl: myProfileImageUrl,
+                timestamp: serverTimestamp()
             })
             setMessage('')
         } catch (e) {
@@ -81,8 +96,9 @@ export const Page = () => {
                 const message = String(chatData['message'] ?? '')
                 const uid = String(chatData['uid'] ?? '')
                 const profileImageUrl = String((chatData['profileImageUrl'] ?? ''))
+                const timestamp = chatData['timestamp'] ? new Date(chatData['timestamp']) : null
 
-                setChats((prev) => [...prev, { message, uid, profileImageUrl: profileImageUrl }])
+                setChats((prev) => [...prev, { message, uid, profileImageUrl: profileImageUrl, timestamp: timestamp }])
             })
         } catch (e) {
             if (e instanceof FirebaseError) {
@@ -122,6 +138,7 @@ export const Page = () => {
                             key={`ChatMessage_${index}`}
                             uid={chat.uid}
                             imageUrl={chat.profileImageUrl}
+                            timestamp={chat.timestamp}
                         />
                     ))}
                 </Flex>
