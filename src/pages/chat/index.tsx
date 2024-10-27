@@ -39,7 +39,8 @@ const Message = ({ message, uid, imageUrl, timestamp }: MessageProps) => {
         <Flex
             alignItems={'center'}
             justifyContent={isCurrentUser ? 'flex-end' : 'flex-start'}
-            mt={isCurrentUser ? 2 : 0}
+            mt={isCurrentUser ? 1 : 0}
+            mb={isCurrentUser ? 1 : 0}
         >
             {isCurrentUser && (
                 <Text fontSize="xs" mt={1}>
